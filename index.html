@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FOUNDRY // Topological Solitons & Integrable Manifolds</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌊</text></svg>">
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+        </svg>
+      </div>
+      <div>
+        <h1>FOUNDRY // <span>Solitons</span></h1>
+      </div>
+      <span class="system-badge" id="active-system-badge">KdV // Korteweg-de Vries</span>
+    </div>
+
+    <div class="header-telemetry">
+      <div class="telemetry-item">
+        <span class="telemetry-label">Evolution Time (t)</span>
+        <span class="telemetry-val" id="telemetry-time">0.000</span>
+      </div>
+      <div class="telemetry-item">
+        <span class="telemetry-label">Invariant Drift (ΔE/E₀)</span>
+        <span class="telemetry-val" id="telemetry-drift">0.00e-0</span>
+      </div>
+      <div class="telemetry-item">
+        <span class="telemetry-label">Charge / Norm</span>
+        <span class="telemetry-val" id="telemetry-charge">0.0000</span>
+      </div>
+      <div class="telemetry-item">
+        <span class="telemetry-label">FPS / Engine</span>
+        <span class="telemetry-val" id="telemetry-fps">60.0</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="app-container">
+    <!-- Controls Sidebar -->
+    <aside class="sidebar">
+      <!-- System Selector -->
+      <div class="control-section">
+        <div class="section-title">Physical System / PDE</div>
+        <div class="model-tabs">
+          <button class="model-tab-btn active" data-system="kdv">KdV (Soliton)</button>
+          <button class="model-tab-btn" data-system="sine-gordon">Sine-Gordon</button>
+          <button class="model-tab-btn" data-system="nlse">NLSE (Rogue)</button>
+          <button class="model-tab-btn" data-system="fput">FPUT (Lattice)</button>
+        </div>
+      </div>
+
+      <!-- Presets -->
+      <div class="control-section">
+        <div class="section-title">Soliton Regime & Initial State</div>
+        <div class="select-wrapper">
+          <select id="preset-select">
+            <!-- Dynamically populated based on active system -->
+          </select>
+        </div>
+      </div>
+
+      <!-- Playback Actions -->
+      <div class="control-section">
+        <div class="section-title">Numerical Engine Controls</div>
+        <div class="button-row">
+          <button class="btn btn-primary" id="btn-play-pause">Pause</button>
+          <button class="btn btn-secondary" id="btn-step">Step</button>
+          <button class="btn btn-danger" id="btn-reset">Reset</button>
+        </div>
+        <div class="button-row" style="margin-top: 8px;">
+          <button class="btn btn-secondary" id="btn-audio">Audio: Muted</button>
+          <button class="btn btn-clear-waterfall" id="btn-clear-waterfall">Clear History</button>
+        </div>
+      </div>
+
+      <!-- Parameters -->
+      <div class="control-section">
+        <div class="section-title">Integrator Parameters</div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span>Time-step (dt)</span>
+            <span id="label-dt">0.005</span>
+          </div>
+          <input type="range" id="slider-dt" min="0.001" max="0.02" step="0.001" value="0.005">
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span>Substeps / Frame</span>
+            <span id="label-substeps">4</span>
+          </div>
+          <input type="range" id="slider-substeps" min="1" max="16" step="1" value="4">
+        </div>
+
+        <div class="slider-group" id="group-param1">
+          <div class="slider-header">
+            <span id="label-param1-name">Velocity / Coupling</span>
+            <span id="label-param1-val">1.0</span>
+          </div>
+          <input type="range" id="slider-param1" min="0.1" max="3.0" step="0.05" value="1.0">
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span>Waterfall Colormap</span>
+            <span id="label-colormap">Cyberpunk</span>
+          </div>
+          <select id="select-colormap">
+            <option value="cyberpunk">Cyberpunk Neon</option>
+            <option value="plasma">Plasma</option>
+            <option value="electric">Electric Turquoise</option>
+            <option value="inferno">Inferno</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Theory Card -->
+      <div class="control-section">
+        <div class="section-title">Mathematical Formulation</div>
+        <div class="theory-card" id="theory-card-content">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </aside>
+
+    <!-- Canvas Viewports -->
+    <main class="viewport">
+      <!-- Primary 1D Waveform Canvas -->
+      <section class="viewport-panel">
+        <div class="panel-header">
+          <span class="panel-title">Primary Spatial Field u(x, t)</span>
+          <span class="panel-sub" id="canvas-sub-label">Real-time Spectral Wave Envelope</span>
+        </div>
+        <div class="canvas-container">
+          <canvas id="primary-canvas"></canvas>
+        </div>
+      </section>
+
+      <!-- Lower Secondary Viewports -->
+      <div class="lower-viewport">
+        <!-- Space-Time Waterfall Canvas -->
+        <section class="lower-panel">
+          <div class="panel-header">
+            <span class="panel-title">Space-Time (x, t) Worldlines</span>
+            <span class="panel-sub">Continuous History Diagram</span>
+          </div>
+          <div class="canvas-container">
+            <canvas id="waterfall-canvas"></canvas>
+          </div>
+        </section>
+
+        <!-- Spectral & Phase Space Canvas -->
+        <section class="lower-panel" style="border-right: none;">
+          <div class="panel-header">
+            <span class="panel-title">Diagnostic Telemetry</span>
+            <span class="panel-sub" id="diag-sub-label">Fourier Energy Spectrum |S(k)|²</span>
+          </div>
+          <div class="canvas-container">
+            <canvas id="diag-canvas"></canvas>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Load Modules -->
+  <script src="src/core/fft.js"></script>
+  <script src="src/solvers/kdv.js"></script>
+  <script src="src/solvers/sine_gordon.js"></script>
+  <script src="src/solvers/nlse.js"></script>
+  <script src="src/solvers/fput.js"></script>
+  <script src="src/visualizer/waterfall.js"></script>
+  <script src="src/audio/sonification.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
